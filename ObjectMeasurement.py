@@ -2,8 +2,9 @@ import cv2
 import utlis
 
 ###################################
-webcam = True
+webcam = False
 path = '1.jpg'
+#path = '2.png'
 cap = cv2.VideoCapture(0)
 cap.set(10,160)
 cap.set(3,1920)
