@@ -7,7 +7,9 @@ path = "1.jpg"
 # path = '2.png'
 # path = '3.png'
 # path = '4.png'
-cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("video.mp4")
+
 cap.set(10, 160)
 cap.set(3, 1920)
 cap.set(4, 1080)
@@ -32,7 +34,7 @@ while True:
         imgWarp = test_utils.warpImg(img, biggest, wP, hP)
         # cv2.imshow("A4", imgWarp)
         imgContours2, conts2 = test_utils.getContours(
-            imgWarp, minArea=2000, filter=4, cThr=[50, 50], draw=False
+            imgWarp, minArea=2000, filter=4, cThr=[20, 200], draw=False
         )
 
         if len(conts) != 0:
@@ -85,4 +87,4 @@ while True:
         cv2.imshow("A4", imgContours2)
 
     cv2.imshow("Original", img)
-    cv2.waitKey(5)
+    cv2.waitKey(50)

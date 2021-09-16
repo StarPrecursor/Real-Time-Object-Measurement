@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "utlis"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }

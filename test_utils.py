@@ -16,26 +16,49 @@ def adjust_img(img, brightness=30, contrast=50):
 
     final_hsv = cv2.merge((h, s, v))
     img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+
+    (b, g, r) = cv2.split(img.astype("float"))
+    g = 1.5 * g
+    b = b * 0.2
+    r = r * 0.2
+    g = np.clip(g, 0, 255)
+    print("b shape", b.shape)
+    img = cv2.merge((b, g, r))
+    img = np.uint8(img)
+
     return img
 
 
 def getContours(
     img, cThr=[100, 100], showCanny=False, minArea=1000, filter=0, draw=False
 ):
-    # imgBright = adjust_img(img, brightness=50, contrast=120)
-    # cv2.imshow("Bright", imgBright)
-    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    imgBlur = cv2.GaussianBlur(imgGray, (5, 5), 1)
-    # cv2.imshow("Blur", imgBlur)
-    imgCanny = cv2.Canny(imgBlur, cThr[0], cThr[1])
-    kernel = np.ones((5, 5))
-    imgDial = cv2.dilate(imgCanny, kernel, iterations=3)
-    imgThre = cv2.erode(imgDial, kernel, iterations=2)
+    ori_img = np.copy(img)
+    img = adjust_img(img, brightness=80, contrast=120)
+    cv2.imshow("Bright", img)
+    #imgGray = cv2.cvtColor(imgBright, cv2.COLOR_BGR2GRAY)
+    img = cv2.GaussianBlur(img, (5, 5), 1)
+    cv2.imshow("Blur", img)
+    img = cv2.Canny(img, cThr[0], cThr[1])
+    kernel = np.ones((3, 3))
+    img = cv2.dilate(img, kernel, iterations=1)
+    #img = cv2.erode(img, (1, 1), iterations=5)
+
+    line_img = np.copy(img) * 0
+    lines = cv2.HoughLinesP(img, 1, np.pi / 3600, 15, np.array([]), 50, 20)
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            cv2.line(line_img, (x1, y1), (x2, y2), (255, 0, 0), 5)
+    pad = np.zeros(line_img.shape)
+    print(line_img.shape, pad.shape)
+    line_img = cv2.merge((line_img, line_img, line_img))
+    print(ori_img.shape, line_img.shape)
+    img_l = cv2.addWeighted(ori_img, 0.8, line_img, 1, 0)
+
     if showCanny:
-        cv2.imshow("Canny", imgThre)
+        cv2.imshow("Canny", img_l)
 
     contours, hiearchy = cv2.findContours(
-        imgThre, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
     finalCountours = []
     for i in contours:
